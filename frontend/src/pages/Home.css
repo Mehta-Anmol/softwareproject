@@ -1,10 +1,10 @@
 .home-container {
   min-height: 100vh;
-  background-color: #f8f9fa;
+  background-color: #323d48;
 }
 
 .hero-banner {
-  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  background: linear-gradient(135deg, #6366f1 0%, #0d0c24 100%);
   color: white;
   padding: 6rem 2rem;
   text-align: center;
@@ -13,7 +13,7 @@
 }
 
 .hero-banner::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
@@ -76,7 +76,7 @@
   font-size: 2rem;
   font-weight: 700;
   margin-bottom: 2rem;
-  color: #1f2937;
+  color: #5e7ca6;
   text-align: center;
 }
 
@@ -87,7 +87,7 @@
 }
 
 .question-card {
-  background: white;
+  background: rgb(169, 189, 217);
   border-radius: 1rem;
   padding: 1.5rem;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
@@ -178,7 +178,8 @@
   color: #6b7280;
 }
 
-.loading, .error {
+.loading,
+.error {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -189,4 +190,4 @@
 
 .error {
   color: #ef4444;
-} 
+}

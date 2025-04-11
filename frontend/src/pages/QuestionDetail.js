@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import axios from "axios";
 
 export default function QuestionDetail() {
   const { id } = useParams();
@@ -9,29 +9,29 @@ export default function QuestionDetail() {
   const [question, setQuestion] = useState(null);
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [newAnswer, setNewAnswer] = useState('');
-  const [newComment, setNewComment] = useState('');
+  const [error, setError] = useState("");
+  const [newAnswer, setNewAnswer] = useState("");
+  const [newComment, setNewComment] = useState("");
   const [, setCommentingOn] = useState(null);
 
   useEffect(() => {
     const fetchQuestion = async () => {
       try {
-        console.log('Fetching question with ID:', id);
+        console.log("Fetching question with ID:", id);
         const [questionResponse, answersResponse] = await Promise.all([
           axios.get(`http://localhost:5000/api/questions/${id}`),
-          axios.get(`http://localhost:5000/api/answers/question/${id}`)
+          axios.get(`http://localhost:5000/api/answers/question/${id}`),
         ]);
-        console.log('Question data:', questionResponse.data);
-        console.log('Answers data:', answersResponse.data);
+        console.log("Question data:", questionResponse.data);
+        console.log("Answers data:", answersResponse.data);
         setQuestion(questionResponse.data);
         setAnswers(answersResponse.data);
       } catch (error) {
-        console.error('Error fetching question:', error);
+        console.error("Error fetching question:", error);
         if (error.response?.status === 404) {
-          setError('Question not found');
+          setError("Question not found");
         } else {
-          setError('Failed to fetch question details. Please try again.');
+          setError("Failed to fetch question details. Please try again.");
         }
       } finally {
         setLoading(false);
@@ -41,7 +41,7 @@ export default function QuestionDetail() {
     if (id) {
       fetchQuestion();
     } else {
-      setError('Invalid question ID');
+      setError("Invalid question ID");
       setLoading(false);
     }
   }, [id]);
@@ -49,43 +49,45 @@ export default function QuestionDetail() {
   const handleVote = async (type, itemId, voteType) => {
     try {
       if (!user) {
-        setError('Please log in to vote');
+        setError("Please log in to vote");
         return;
       }
 
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (!token) {
-        setError('Please log in to vote');
+        setError("Please log in to vote");
         return;
       }
 
-      const endpoint = type === 'question' ? 'questions' : 'answers';
+      const endpoint = type === "question" ? "questions" : "answers";
       const response = await axios.post(
         `http://localhost:5000/api/${endpoint}/${itemId}/vote`,
         { voteType },
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
       // Update the data based on the response
-      if (type === 'question') {
+      if (type === "question") {
         setQuestion(response.data);
       } else {
-        setAnswers(answers.map(answer => 
-          answer._id === itemId ? response.data : answer
-        ));
+        setAnswers(
+          answers.map((answer) =>
+            answer._id === itemId ? response.data : answer
+          )
+        );
       }
     } catch (error) {
-      console.error('Vote error:', error);
+      console.error("Vote error:", error);
       if (error.response?.status === 401) {
-        setError('Please log in to vote');
+        setError("Please log in to vote");
       } else if (error.response?.data?.message) {
         setError(error.response.data.message);
       } else {
-        setError('Failed to vote. Please try again.');
+        setError("Failed to vote. Please try again.");
       }
     }
   };
@@ -94,31 +96,31 @@ export default function QuestionDetail() {
     e.preventDefault();
     try {
       if (!user) {
-        setError('Please log in to answer');
+        setError("Please log in to answer");
         return;
       }
 
       if (!newAnswer.trim()) {
-        setError('Please enter your answer');
+        setError("Please enter your answer");
         return;
       }
 
-      const response = await axios.post('http://localhost:5000/api/answers', {
+      const response = await axios.post("http://localhost:5000/api/answers", {
         content: newAnswer,
-        questionId: id
+        questionId: id,
       });
 
       // Add the new answer to the list
       setAnswers([response.data, ...answers]);
-      setNewAnswer('');
-      setError('');
+      setNewAnswer("");
+      setError("");
     } catch (error) {
       if (error.response?.status === 401) {
-        setError('Please log in to answer');
+        setError("Please log in to answer");
       } else if (error.response?.data?.message) {
         setError(error.response.data.message);
       } else {
-        setError('Failed to submit answer. Please try again.');
+        setError("Failed to submit answer. Please try again.");
       }
     }
   };
@@ -127,26 +129,29 @@ export default function QuestionDetail() {
     e.preventDefault();
     try {
       if (!user) {
-        setError('Please log in to comment');
+        setError("Please log in to comment");
         return;
       }
 
-      const endpoint = type === 'question' ? 'questions' : 'answers';
-      await axios.post(`http://localhost:5000/api/${endpoint}/${itemId}/comments`, {
-        content: newComment
-      });
+      const endpoint = type === "question" ? "questions" : "answers";
+      await axios.post(
+        `http://localhost:5000/api/${endpoint}/${itemId}/comments`,
+        {
+          content: newComment,
+        }
+      );
 
       // Refresh the data
       const [questionResponse, answersResponse] = await Promise.all([
         axios.get(`http://localhost:5000/api/questions/${id}`),
-        axios.get(`http://localhost:5000/api/answers/question/${id}`)
+        axios.get(`http://localhost:5000/api/answers/question/${id}`),
       ]);
       setQuestion(questionResponse.data);
       setAnswers(answersResponse.data);
-      setNewComment('');
+      setNewComment("");
       setCommentingOn(null);
     } catch (error) {
-      setError('Failed to submit comment');
+      setError("Failed to submit comment");
     }
   };
 
@@ -161,7 +166,9 @@ export default function QuestionDetail() {
   if (!question) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-900">
-        <div className="text-red-500 text-xl">{error || 'Question not found'}</div>
+        <div className="text-red-500 text-xl">
+          {error || "Question not found"}
+        </div>
       </div>
     );
   }
@@ -174,14 +181,14 @@ export default function QuestionDetail() {
             {error}
           </div>
         )}
-        
+
         {/* Question */}
         <div className="card mb-8">
           <div className="flex items-start space-x-4">
             <div className="flex flex-col items-center space-y-2">
               <button
                 className="text-gray-400 hover:text-primary-500"
-                onClick={() => handleVote('question', question._id, 'upvote')}
+                onClick={() => handleVote("question", question._id, "upvote")}
               >
                 <svg
                   className="h-6 w-6"
@@ -202,7 +209,7 @@ export default function QuestionDetail() {
               </span>
               <button
                 className="text-gray-400 hover:text-primary-500"
-                onClick={() => handleVote('question', question._id, 'downvote')}
+                onClick={() => handleVote("question", question._id, "downvote")}
               >
                 <svg
                   className="h-6 w-6"
@@ -220,7 +227,9 @@ export default function QuestionDetail() {
               </button>
             </div>
             <div className="flex-1">
-              <h1 className="text-3xl font-bold text-white">{question.title}</h1>
+              <h1 className="text-3xl font-bold text-white">
+                {question.title}
+              </h1>
               <p className="mt-4 text-gray-300">{question.content}</p>
               <div className="mt-4 flex items-center space-x-4 text-sm text-gray-400">
                 <span>Asked by {question.author.name}</span>
@@ -252,14 +261,18 @@ export default function QuestionDetail() {
                   <div className="mt-2 text-sm text-gray-400">
                     <span>Commented by {comment.author.name}</span>
                     <span className="mx-2">•</span>
-                    <span>{new Date(comment.createdAt).toLocaleDateString()}</span>
+                    <span>
+                      {new Date(comment.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
                 </div>
               ))}
             </div>
             {user && (
               <form
-                onSubmit={(e) => handleSubmitComment(e, question._id, 'question')}
+                onSubmit={(e) =>
+                  handleSubmitComment(e, question._id, "question")
+                }
                 className="mt-4"
               >
                 <textarea
@@ -280,7 +293,7 @@ export default function QuestionDetail() {
         {/* Answers */}
         <div className="space-y-8">
           <h2 className="text-2xl font-bold text-white">
-            {answers.length} {answers.length === 1 ? 'Answer' : 'Answers'}
+            {answers.length} {answers.length === 1 ? "Answer" : "Answers"}
           </h2>
           {answers.map((answer) => (
             <div key={answer._id} className="card">
@@ -288,7 +301,7 @@ export default function QuestionDetail() {
                 <div className="flex flex-col items-center space-y-2">
                   <button
                     className="text-gray-400 hover:text-primary-500"
-                    onClick={() => handleVote('answer', answer._id, 'upvote')}
+                    onClick={() => handleVote("answer", answer._id, "upvote")}
                   >
                     <svg
                       className="h-6 w-6"
@@ -309,7 +322,7 @@ export default function QuestionDetail() {
                   </span>
                   <button
                     className="text-gray-400 hover:text-primary-500"
-                    onClick={() => handleVote('answer', answer._id, 'downvote')}
+                    onClick={() => handleVote("answer", answer._id, "downvote")}
                   >
                     <svg
                       className="h-6 w-6"
@@ -331,27 +344,38 @@ export default function QuestionDetail() {
                   <div className="mt-4 flex items-center space-x-4 text-sm text-gray-400">
                     <span>Answered by {answer.author.name}</span>
                     <span>•</span>
-                    <span>{new Date(answer.createdAt).toLocaleDateString()}</span>
+                    <span>
+                      {new Date(answer.createdAt).toLocaleDateString()}
+                    </span>
                   </div>
 
                   {/* Answer Comments */}
                   <div className="mt-6">
-                    <h3 className="text-lg font-semibold text-white mb-2">Comments</h3>
+                    <h3 className="text-lg font-semibold text-white mb-2">
+                      Comments
+                    </h3>
                     <div className="space-y-4">
                       {answer.comments.map((comment) => (
-                        <div key={comment._id} className="bg-gray-800 p-4 rounded-lg">
+                        <div
+                          key={comment._id}
+                          className="bg-gray-800 p-4 rounded-lg"
+                        >
                           <p className="text-gray-300">{comment.content}</p>
                           <div className="mt-2 text-sm text-gray-400">
                             <span>Commented by {comment.author.name}</span>
                             <span className="mx-2">•</span>
-                            <span>{new Date(comment.createdAt).toLocaleDateString()}</span>
+                            <span>
+                              {new Date(comment.createdAt).toLocaleDateString()}
+                            </span>
                           </div>
                         </div>
                       ))}
                     </div>
                     {user && (
                       <form
-                        onSubmit={(e) => handleSubmitComment(e, answer._id, 'answer')}
+                        onSubmit={(e) =>
+                          handleSubmitComment(e, answer._id, "answer")
+                        }
                         className="mt-4"
                       >
                         <textarea
@@ -387,8 +411,8 @@ export default function QuestionDetail() {
                   rows="6"
                 />
               </div>
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 className="px-6 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
               >
                 Post Answer
@@ -398,11 +422,15 @@ export default function QuestionDetail() {
         ) : (
           <div className="mt-8 bg-gray-800 p-6 rounded-lg">
             <p className="text-white">
-              Please <a href="/login" className="text-primary-500 hover:underline">log in</a> to post an answer.
+              Please{" "}
+              <a href="/login" className="text-primary-500 hover:underline">
+                log in
+              </a>{" "}
+              to post an answer.
             </p>
           </div>
         )}
       </div>
     </div>
   );
-} 
+}
