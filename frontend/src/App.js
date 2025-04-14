@@ -8,6 +8,7 @@ import Register from "./pages/Register";
 import AskQuestion from "./pages/AskQuestion";
 import QuestionDetail from "./pages/QuestionDetail";
 import UserProfile from "./pages/UserProfile";
+import Questions from "./pages/Questions";
 
 function App() {
   return (
@@ -20,8 +21,9 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/ask" element={<AskQuestion />} />
+            <Route path="/questions" element={<Questions />} />
             <Route path="/question/:id" element={<QuestionDetail />} />
-            <Route path="/user/:id" element={<UserProfile />} />
+            <Route path="/profile/:id" element={<UserProfile />} />
           </Routes>
         </div>
       </AuthProvider>
